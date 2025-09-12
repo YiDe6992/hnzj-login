@@ -1,4 +1,4 @@
-# hnzj-login
+# 河南职业技术学院-校园网自动登录
 
 ## 目录
 
@@ -47,3 +47,4 @@ pingurl     = bing.com
 # 窗口隐藏
 hide_window = False
 ```
+
