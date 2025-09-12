@@ -33,10 +33,10 @@ else:
 # 判断是否隐藏窗口
 if config['config']['hide_window'] == 'True':
     whnd = ctypes.windll.kernel32.GetConsoleWindow()
-if whnd != 0:
-    # 隐藏窗口
-    ctypes.windll.user32.ShowWindow(whnd, 0) 
-    logging.info("窗口已隐藏")
+    if whnd != 0:
+        # 隐藏窗口
+        ctypes.windll.user32.ShowWindow(whnd, 0) 
+        logging.info("窗口已隐藏")
 
 # 获取等待时间  
 timesleep  = float(config['config']['timesleep'])
@@ -66,4 +66,5 @@ else:
         login.run(userid, password, Corporation)
     else:
         logging.info("网络正常")
+
     logging.info("程序结束 " + login.sys_time())
