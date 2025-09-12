@@ -40,7 +40,7 @@ Corporation = cmcc
 keep_alive  = False
 # 每隔多少秒运行一次
 timesleep   = 60
-# 测试网址(不会改就别乱动)
+# 测试网址
 pingurl     = bing.com
 # 窗口隐藏
 hide_window = False
