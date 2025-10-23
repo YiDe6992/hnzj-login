@@ -1,70 +1,61 @@
 import time
-import login
-import configparser
 import logging
-import ctypes
+import login.login as login
+import login.tool as tool
+import login.log as log
 
-version = "0.0.1"
-logging.info("程序开始 " + login.sys_time())
-logging.info("版本：" + version)
 
-# 读取配置文件
-config = configparser.ConfigParser()
-logging.info("读取配置文件")
-try:
-    config.read('config.ini')
-except UnicodeDecodeError:
-    config.read('config.ini', encoding='utf-8-sig')
-except Exception as e:
-    logging.error("配置文件读取失败")
-    exit()
+version = "0.0.2"
 
-# 获取登录信息
-userid      = config['login']['userid']
-password    = config['login']['password']
-Corporation = config['login']['Corporation']
+def main():
+    # 初始化日志
+    log.logInit()
 
-# 判断是否开启自动登录
-if config['config']['keep_alive'] == 'True':
-    keep_alive = True
-else:
-    keep_alive = False
+    logging.info("程序开始 " + tool.sysTime())
+    logging.info("版本：" + version)
 
-# 判断是否隐藏窗口
-if config['config']['hide_window'] == 'True':
-    whnd = ctypes.windll.kernel32.GetConsoleWindow()
-    if whnd != 0:
-        # 隐藏窗口
-        ctypes.windll.user32.ShowWindow(whnd, 0) 
-        logging.info("窗口已隐藏")
+    # 初始化配置文件
+    config = tool.initconfig()
+    # 获取等待时间  
+    timesleep  = float(config['config']['timesleep'])
+    # 判断是否开启自动登录
+    match config["config"]["keepalive"].lower():
+        case "true":
+            keepAlive = True
+        case "false":
+            keepAlive = False
+        case _:
+            keepAlive = False        # 兜底，防止配置写错
 
-# 获取等待时间  
-timesleep  = float(config['config']['timesleep'])
+    app = login.LoginApp(
+        config['config']['pingurl'],
+        config['login']['userid'],
+        config['login']['password'],
+        config['login']['Corporation'],
+        int(config["login"]["nettype"])
+    )
 
-# 获取测试网址
-pingurl = config['config']['pingurl']
+    a = True
+    while a:
+        if keepAlive:
+            logging.info("持续运行已开启")
 
-# 程序逻辑
-if keep_alive:
-    logging.info("持续运行已开启")
-    while True:
         logging.info("检查网络")
-
-        if login.ping("bing.com") == False:
-            logging.info("尝试连接校园网")
-            login.run(userid, password, Corporation)
-            logging.info("等待{}秒".format(timesleep))
-        else:
+        if app.ping():
             logging.info("网络正常")
             logging.info("等待{}秒".format(timesleep))
-        time.sleep(timesleep)
-else:
-    logging.info("持续运行已关闭")
-    logging.info("检查网络")
-    if login.ping(pingurl) == False:
-        logging.info("尝试连接校园网")
-        login.run(userid, password, Corporation)
-    else:
-        logging.info("网络正常")
+        else:
+            logging.info("尝试连接校园网")
+            app.run()
+            logging.info("等待{}秒".format(timesleep))
 
-    logging.info("程序结束 " + login.sys_time())
+        if keepAlive:
+            time.sleep(timesleep)
+        else:
+            a = False
+            logging.info("程序结束 " + tool.sysTime())
+
+
+
+if __name__ == "__main__":
+    main()
