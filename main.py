@@ -43,18 +43,17 @@ def main():
         logging.info("检查网络")
         if app.ping():
             logging.info("网络正常")
-            logging.info("等待{}秒".format(timesleep))
         else:
             logging.info("尝试连接校园网")
             app.run()
-            logging.info("等待{}秒".format(timesleep))
 
         if keepAlive:
             time.sleep(timesleep)
+            logging.info("等待{}秒".format(timesleep))
         else:
             a = False
             logging.info("程序结束 " + tool.sysTime())
-
+        
 
 
 if __name__ == "__main__":
